@@ -5,13 +5,13 @@ import { getEnv } from "./utils";
 async function checkRoyaltyPayments(signature: string) {
   const apiKey = getEnv("API_KEY");
 
-  // Parse transaction and extract NFT event
+  // Parse transaction and extract NFT event.
   const txn = await parseTxn(signature, apiKey);
   const nftEvent = txn.events.nft;
   const nft = nftEvent.nfts[0];
   console.log(`NFT ${nft.mint} was purchased. Checking royalties.`);
 
-  // Get NFT metadata for the purchased NFT
+  // Get NFT metadata for the purchased NFT.
   const metadata = await getNftMetadata(nft.mint, apiKey);
   const creators = metadata.onChainData.data.creators;
   const royaltyBips = metadata.onChainData.data.sellerFeeBasisPoints;
@@ -20,7 +20,7 @@ async function checkRoyaltyPayments(signature: string) {
     `Expecting royalty payment of ${expectedPayment} for the NFT sale.`
   );
 
-  // Look over creators and check royalty payments
+  // Look over creators and check royalty payments.
   for (const creator of creators) {
     if (creator.share > 0) {
       const royaltyPayment = txn.nativeTransfers
@@ -29,7 +29,7 @@ async function checkRoyaltyPayments(signature: string) {
       if (royaltyPayment !== undefined) {
         const expectedShare = (creator.share / 100) * royaltyPayment;
         console.log(
-          `${royaltyPayment}/${expectedShare} of royalty paid for ${creator.address}`
+          `${royaltyPayment}/${expectedShare} of royalty paid for ${creator.address}.`
         );
       } else {
         `No royalty paid for ${creator.address}.`;
@@ -61,10 +61,8 @@ async function getNftMetadata(mint: string, apiKey: string) {
 function getArgs() {
   const args = require("minimist")(process.argv.slice(2));
   const signature = args.signature as string;
-  const useHelius = args.useHelius as boolean;
   return {
     signature,
-    useHelius,
   };
 }
 
